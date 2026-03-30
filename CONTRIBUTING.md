@@ -16,7 +16,7 @@ First off, thank you for considering contributing to Copper-rs! We welcome contr
     ```
 * **cargo-nextest:** For running tests efficiently.
     ```bash
-    cargo install cargo-nextest
+    cargo install cargo-nextest --locked
     ```
 * **typos:** For spell checking.
     ```bash
