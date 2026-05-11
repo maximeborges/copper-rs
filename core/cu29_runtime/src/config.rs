@@ -470,6 +470,36 @@ impl From<Value> for String {
     }
 }
 
+impl<T> TryFrom<&Value> for Vec<T>
+where
+    T: for<'a> TryFrom<&'a Value, Error = ConfigError>,
+{
+    type Error = ConfigError;
+
+    fn try_from(value: &Value) -> Result<Self, Self::Error> {
+        if let Value(RonValue::Seq(seq)) = value {
+            seq.iter()
+                .map(|v| T::try_from(&Value(v.clone())))
+                .collect()
+        } else {
+            Err(ConfigError::type_mismatch("list", value))
+        }
+    }
+}
+
+impl<T: Into<Value>> From<Vec<T>> for Value {
+    fn from(vec: Vec<T>) -> Self {
+        Value(RonValue::Seq(
+            vec.into_iter()
+                .map(|v| {
+                    let Value(ron) = v.into();
+                    ron
+                })
+                .collect(),
+        ))
+    }
+}
+
 impl Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let Value(value) = self;
